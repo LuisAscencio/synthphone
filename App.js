@@ -3,6 +3,7 @@ import {StyleSheet, View} from 'react-native';
 import Matter from 'matter-js';
 import {GameEngine} from 'react-native-game-engine';
 import Bird from './components/Bird';
+import Physics from './components/Physics';
 import Constants from './components/Constants';
 
 export default class App extends Component {
@@ -46,6 +47,7 @@ export default class App extends Component {
           }}
           style={styles.gameContainer}
           running={this.state.running}
+          systems={[Physics]}
           entities={this.entities}>
           {/* <StatusBar hidden={true} /> */}
         </GameEngine>
