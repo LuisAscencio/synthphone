@@ -4,6 +4,7 @@ import Matter from 'matter-js';
 import {GameEngine} from 'react-native-game-engine';
 import Bird from './components/Bird';
 import Physics from './components/Physics';
+import Wall from './components/Wall';
 import Constants from './components/Constants';
 
 export default class App extends Component {
@@ -29,12 +30,25 @@ export default class App extends Component {
       50,
       50,
     );
+    let floor = Matter.Bodies.rectangle(
+      Constants.MAX_WIDTH / 2,
+      Constants.MAX_HEIGHT - 90,
+      Constants.MAX_WIDTH,
+      50,
+      {isStatic: true},
+    );
 
-    Matter.World.add(world, [bird]);
+    Matter.World.add(world, [bird, floor]);
 
     return {
       physics: {engine: engine, world: world},
-      bird: {body: bird, size: [50, 50], color: 'red', renderer: Bird},
+      bird: {body: bird, size: [50, 50], color: 'brown', renderer: Bird},
+      floor: {
+        body: floor,
+        size: [Constants.MAX_WIDTH, 50],
+        color: 'blue',
+        renderer: Wall,
+      },
     };
   };
 
