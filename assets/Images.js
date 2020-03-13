@@ -1,4 +1,4 @@
 export default Images = {
-  background: require('./img/MarsBackground.png'),
+  background: require('./img/cavebg.jpg'),
   floor: require('./img/RockyFloor1.png'),
 };
