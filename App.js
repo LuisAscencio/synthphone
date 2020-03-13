@@ -6,6 +6,7 @@ import {
   Text,
   Alert,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import Matter from 'matter-js';
 import {GameEngine} from 'react-native-game-engine';
@@ -13,6 +14,8 @@ import Bird from './components/Bird';
 import Physics from './components/Physics';
 import Wall from './components/Wall';
 import Constants from './components/Constants';
+import Images from './assets/Images';
+
 export const randomBetween = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
@@ -173,6 +176,11 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Image
+          source={Images.background}
+          style={styles.backgroundImage}
+          resizeMode="stretch"
+        />
         <GameEngine
           ref={ref => {
             this.gameEngine = ref;
