@@ -15,24 +15,7 @@ import Physics from './components/Physics';
 import Wall from './components/Wall';
 import Constants from './components/Constants';
 import Images from './assets/Images';
-
-export const randomBetween = (min, max) => {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-};
-
-export const generatePipes = () => {
-  let topPipeHeight = randomBetween(100, Constants.MAX_HEIGHT / 2 - 100);
-  let bottomPipeHeight =
-    Constants.MAX_HEIGHT - topPipeHeight - Constants.GAP_SIZE;
-
-  let sizes = [topPipeHeight, bottomPipeHeight];
-
-  if (Math.random() < 0.5) {
-    sizes = sizes.reverse();
-  }
-
-  return sizes;
-};
+import Floor from './components/Floor';
 
 export default class App extends Component {
   constructor(props) {
@@ -40,6 +23,7 @@ export default class App extends Component {
 
     this.state = {
       running: true,
+      score: 0,
     };
 
     this.gameEngine = null;
@@ -50,65 +34,32 @@ export default class App extends Component {
   setupWorld = () => {
     let engine = Matter.Engine.create({enableSleeping: false});
     let world = engine.world;
-    world.gravity.y = 1.2;
+    world.gravity.y = 0.0;
 
     let bird = Matter.Bodies.rectangle(
-      Constants.MAX_WIDTH / 4,
+      Constants.MAX_WIDTH / 2,
       Constants.MAX_HEIGHT / 2,
-      50,
-      50,
+      Constants.BIRD_WIDTH,
+      Constants.BIRD_HEIGHT,
     );
-    bird.restitution = 20;
-    let floor = Matter.Bodies.rectangle(
+
+    let floor1 = Matter.Bodies.rectangle(
       Constants.MAX_WIDTH / 2,
       Constants.MAX_HEIGHT - 25,
-      Constants.MAX_WIDTH,
-      50,
-      {isStatic: true},
-    );
-    let ceiling = Matter.Bodies.rectangle(
-      Constants.MAX_WIDTH / 2,
-      25,
-      Constants.MAX_WIDTH,
+      Constants.MAX_WIDTH + 4,
       50,
       {isStatic: true},
     );
 
-    let [pipe1Height, pipe2Height] = generatePipes();
-
-    let pipe1 = Matter.Bodies.rectangle(
-      Constants.MAX_WIDTH - Constants.PIPE_WIDTH / 2,
-      pipe1Height / 2,
-      Constants.PIPE_WIDTH,
-      pipe1Height,
-      {isStatic: true},
-    );
-    let pipe2 = Matter.Bodies.rectangle(
-      Constants.MAX_WIDTH - Constants.PIPE_WIDTH / 2,
-      Constants.MAX_HEIGHT - pipe2Height / 2,
-      Constants.PIPE_WIDTH,
-      pipe2Height,
+    let floor2 = Matter.Bodies.rectangle(
+      Constants.MAX_WIDTH + Constants.MAX_WIDTH / 2,
+      Constants.MAX_HEIGHT - 25,
+      Constants.MAX_WIDTH + 4,
+      50,
       {isStatic: true},
     );
 
-    let [pipe3Height, pipe4Height] = generatePipes();
-
-    let pipe3 = Matter.Bodies.rectangle(
-      Constants.MAX_WIDTH * 2 - Constants.PIPE_WIDTH / 2,
-      pipe3Height / 2,
-      Constants.PIPE_WIDTH,
-      pipe3Height,
-      {isStatic: true},
-    );
-    let pipe4 = Matter.Bodies.rectangle(
-      Constants.MAX_WIDTH * 2 - Constants.PIPE_WIDTH / 2,
-      Constants.MAX_HEIGHT - pipe4Height / 2,
-      Constants.PIPE_WIDTH,
-      pipe4Height,
-      {isStatic: true},
-    );
-
-    Matter.World.add(world, [bird, floor, ceiling, pipe1, pipe2, pipe3, pipe4]);
+    Matter.World.add(world, [bird, floor1, floor2]);
     Matter.Events.on(engine, 'collisionStart', event => {
       var pairs = event.pairs;
 
@@ -117,43 +68,9 @@ export default class App extends Component {
 
     return {
       physics: {engine: engine, world: world},
-      floor: {
-        body: floor,
-        size: [Constants.MAX_WIDTH, 50],
-        color: 'green',
-        renderer: Wall,
-      },
-      ceiling: {
-        body: ceiling,
-        size: [Constants.MAX_WIDTH, 50],
-        color: 'green',
-        renderer: Wall,
-      },
-      bird: {body: bird, size: [50, 50], color: 'red', renderer: Bird},
-      pipe1: {
-        body: pipe1,
-        size: [Constants.PIPE_WIDTH, pipe1Height],
-        color: 'green',
-        renderer: Wall,
-      },
-      pipe2: {
-        body: pipe2,
-        size: [Constants.PIPE_WIDTH, pipe2Height],
-        color: 'green',
-        renderer: Wall,
-      },
-      pipe3: {
-        body: pipe3,
-        size: [Constants.PIPE_WIDTH, pipe3Height],
-        color: 'green',
-        renderer: Wall,
-      },
-      pipe4: {
-        body: pipe4,
-        size: [Constants.PIPE_WIDTH, pipe4Height],
-        color: 'green',
-        renderer: Wall,
-      },
+      floor1: {body: floor1, renderer: Floor},
+      floor2: {body: floor2, renderer: Floor},
+      bird: {body: bird, pose: 1, renderer: Bird},
     };
   };
 
@@ -163,13 +80,19 @@ export default class App extends Component {
       this.setState({
         running: false,
       });
+    } else if (e.type === 'score') {
+      this.setState({
+        score: this.state.score + 1,
+      });
     }
   };
 
   reset = () => {
+    resetPipes();
     this.gameEngine.swap(this.setupWorld());
     this.setState({
       running: true,
+      score: 0,
     });
   };
 
@@ -192,12 +115,14 @@ export default class App extends Component {
           entities={this.entities}>
           <StatusBar hidden={true} />
         </GameEngine>
+        <Text style={styles.score}>{this.state.score}</Text>
         {!this.state.running && (
           <TouchableOpacity
             style={styles.fullScreenButton}
             onPress={this.reset}>
             <View style={styles.fullScreen}>
               <Text style={styles.gameOverText}>Game Over</Text>
+              <Text style={styles.gameOverSubText}>Try Again</Text>
             </View>
           </TouchableOpacity>
         )}
@@ -211,6 +136,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  backgroundImage: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    width: Constants.MAX_WIDTH,
+    height: Constants.MAX_HEIGHT,
+  },
   gameContainer: {
     position: 'absolute',
     top: 0,
@@ -221,6 +155,12 @@ const styles = StyleSheet.create({
   gameOverText: {
     color: 'white',
     fontSize: 48,
+    fontFamily: '04b_19',
+  },
+  gameOverSubText: {
+    color: 'white',
+    fontSize: 24,
+    fontFamily: '04b_19',
   },
   fullScreen: {
     position: 'absolute',
@@ -232,6 +172,17 @@ const styles = StyleSheet.create({
     opacity: 0.8,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  score: {
+    position: 'absolute',
+    color: 'white',
+    fontSize: 72,
+    top: 50,
+    left: Constants.MAX_WIDTH / 2 - 20,
+    textShadowColor: '#444444',
+    textShadowOffset: {width: 2, height: 2},
+    textShadowRadius: 2,
+    fontFamily: '04b_19',
   },
   fullScreenButton: {
     position: 'absolute',
