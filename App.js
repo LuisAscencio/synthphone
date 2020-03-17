@@ -11,7 +11,7 @@ import {
 import Matter from 'matter-js';
 import {GameEngine} from 'react-native-game-engine';
 import Bird from './components/Bird';
-import Physics from './components/Physics';
+import Physics, {resetPipes} from './components/Physics';
 import Wall from './components/Wall';
 import Constants from './components/Constants';
 import Images from './assets/Images';
