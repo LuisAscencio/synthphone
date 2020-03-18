@@ -110,7 +110,7 @@ const Physics = (entities, {touches, time, dispatch}) => {
     .forEach(t => {
       if (!hadTouches) {
         if (world.gravity.y === 0.0) {
-          world.gravity.y = 0.1;
+          world.gravity.y = 0.25;
 
           addPipesAtLocation(
             Constants.MAX_WIDTH * 2 - Constants.PIPE_WIDTH / 2,

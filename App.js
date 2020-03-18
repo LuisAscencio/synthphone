@@ -11,6 +11,7 @@ import {
 import Matter from 'matter-js';
 import {GameEngine} from 'react-native-game-engine';
 import Bird from './components/Bird';
+import Gas from './components/Gas';
 import Physics, {resetPipes} from './components/Physics';
 import Wall from './components/Wall';
 import Constants from './components/Constants';
@@ -71,6 +72,7 @@ export default class App extends Component {
       floor1: {body: floor1, renderer: Floor},
       floor2: {body: floor2, renderer: Floor},
       bird: {body: bird, pose: 1, renderer: Bird},
+      // gas: {body: gas, renderer: Gas},
     };
   };
 
@@ -115,6 +117,19 @@ export default class App extends Component {
           entities={this.entities}>
           <StatusBar hidden={true} />
         </GameEngine>
+
+        <Image
+          style={{
+            position: 'absolute',
+            left: Constants.MAX_WIDTH / 2 - 20,
+            top: Constants.MAX_HEIGHT / 2 - 20,
+            width: 50,
+            height: 50,
+            transform: [{rotate: '180deg'}],
+          }}
+          resizeMode="stretch"
+          source={Images['boost']}
+        />
         <Text style={styles.score}>{this.state.score}</Text>
         {!this.state.running && (
           <TouchableOpacity
