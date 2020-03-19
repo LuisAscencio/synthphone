@@ -118,18 +118,7 @@ export default class App extends Component {
           <StatusBar hidden={true} />
         </GameEngine>
 
-        <Image
-          style={{
-            position: 'absolute',
-            left: Constants.MAX_WIDTH / 2 - 20,
-            top: Constants.MAX_HEIGHT / 2 - 20,
-            width: 50,
-            height: 50,
-            transform: [{rotate: '180deg'}],
-          }}
-          resizeMode="stretch"
-          source={Images['boost']}
-        />
+        <Gas />
         <Text style={styles.score}>{this.state.score}</Text>
         {!this.state.running && (
           <TouchableOpacity
